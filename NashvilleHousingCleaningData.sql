@@ -120,9 +120,6 @@ SET SoldAsVacant =  CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
         WHEN SoldAsVacant = 'N' THEN 'No'
         ELSE SoldAsVacant
         END
---This update the current column SoldAsVacant with only Yes and No values
---Rerun first SELECT and you'll see there are only Yes and No values now in that column (no y or n's)
-
 
 -- Remove Dupilcates
 WITH RowNumCTE AS( --This creates a new temp table where if any of the listed columns 
