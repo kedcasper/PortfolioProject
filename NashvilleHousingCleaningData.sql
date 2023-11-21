@@ -15,21 +15,21 @@ SET SaleDate = CONVERT(Date,SaleDate)
 
 
 
--- Populate Property Address Data (FOR ADDRESSES THAT ARE NULL)
+-- Populate Property Address Data (for addresses that are null)
 SELECT *
 FROM [dbo].[Nashville_Housing]
 --WHERE PropertyAddress IS NULL
 ORDER BY ParcelID
 
-SELECT a.ParcelID, a.PropertyAddress, b.ParcelID, b.PropertyAddress, ISNULL(a.PropertyAddress,b.PropertyAddress) --this says if (X is null, replace with Y)
+SELECT a.ParcelID, a.PropertyAddress, b.ParcelID, b.PropertyAddress, ISNULL(a.PropertyAddress,b.PropertyAddress)
 FROM [dbo].[Nashville_Housing] AS a
 JOIN [dbo].[Nashville_Housing] AS b 
     ON a.ParcelID = b.ParcelID
-    AND a.UniqueID <> b.UniqueID --this join the same table togetheto itself where parcelID are the same and UniqueID are different
+    AND a.UniqueID <> b.UniqueID 
 WHERE a.PropertyAddress IS NULL
 
-UPDATE a --HAVE TO USE ALIAS WHEN UPDATES A JOIN
-SET PropertyAddress = ISNULL(a.PropertyAddress,b.PropertyAddress) -- Could replace with No Address
+UPDATE a 
+SET PropertyAddress = ISNULL(a.PropertyAddress,b.PropertyAddress) 
 FROM [dbo].[Nashville_Housing] AS a
 JOIN [dbo].[Nashville_Housing] AS b 
     ON a.ParcelID = b.ParcelID
@@ -37,19 +37,16 @@ JOIN [dbo].[Nashville_Housing] AS b
 WHERE a.PropertyAddress IS NULL
 
 
--- Breaking out Address into Individual Columns (Address, City, State) SUBSTRING--
+-- Breaking out Address into Individual Columns (Address, City, State) 
 
 SELECT PropertyAddress
 FROM [dbo].[Nashville_Housing]
 
 SELECT 
     SUBSTRING(PropertyAddress, 1, CHARINDEX(',', PropertyAddress) -1) AS Address,
---this says start at first value and go until comma, include -1 to remove comma (go back 1 position)
     SUBSTRING(PropertyAddress, CHARINDEX(',', PropertyAddress) + 1 , LEN(PropertyAddress)) AS City
---this says start after comma and go until length of address
 FROM [dbo].[Nashville_Housing]
---CHARINDEX searches for parrticlaur value
---SUBSTRING has 3 arguments (column with string, start, end)
+
 
 --THIS CREATES NEW COLUMNS IN TABlE
 ALTER TABLE Nashville_Housing
@@ -122,7 +119,7 @@ SET SoldAsVacant =  CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
         END
 
 -- Remove Dupilcates
-WITH RowNumCTE AS( --This creates a new temp table where if any of the listed columns 
+WITH RowNumCTE AS( 
 SELECT *,
     ROW_NUMBER() OVER (
         PARTITION BY ParcelID, 
@@ -137,10 +134,10 @@ FROM [dbo].[Nashville_Housing]
 --ORDER BY ParcelID
 )
 --DELETE 
---FROM RowNumCTE -- now able to select from this table
---WHERE Row_Num > 1 --This will remove all the dupliactes
+--FROM RowNumCTE 
+--WHERE Row_Num > 1 
 SELECT *
-FROM RowNumCTE -- now able to select from this table
+FROM RowNumCTE 
 WHERE Row_Num > 1
 --After running commented out section, ran the select all from table and there was none! No more duplicates
 
